@@ -5,6 +5,7 @@ import cohere
 from qdrant_client import QdrantClient
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from agents import (
@@ -101,6 +102,21 @@ Rules:
 # --------------------------------------------------
 app = FastAPI(title="Humanoid AI RAG Agent")
 
+# ---------------- CORS SETUP ----------------
+origins = [
+    "http://localhost:3000",  # tumhara frontend
+    "https://your-production-domain.com",  # agar deployed frontend hai
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,        # allow specific origins
+    allow_credentials=True,
+    allow_methods=["*"],          # GET, POST, etc.
+    allow_headers=["*"],          # any headers
+)
+
+# --------------------------------------------------
 class QueryRequest(BaseModel):
     query: str
 
