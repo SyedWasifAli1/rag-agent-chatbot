@@ -112,7 +112,7 @@ app = FastAPI(title="Humanoid AI RAG Agent")
 origins = [
     "http://127.0.0.1:5500",
     "http://localhost:3000",
-    "https://your-production-domain.com",
+    "https://hackathon-eight-beige.vercel.app/",
 ]
 
 app.add_middleware(
