@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FastAPI Chatbot</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+
+  <div class="w-full max-w-md bg-gray-800 rounded-xl shadow-lg p-4 flex flex-col">
+    
+    <h1 class="text-xl font-bold text-center mb-3">🤖 FastAPI Chatbot</h1>
+
+    <!-- Chat Area -->
+    <div id="chatBox" class="flex-1 overflow-y-auto space-y-2 mb-3 p-2 bg-gray-900 rounded">
+      <div class="text-gray-400 text-sm text-center">
+        Ask something...
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="flex gap-2">
+      <input
+        id="userInput"
+        type="text"
+        placeholder="Type your message..."
+        class="flex-1 px-3 py-2 rounded bg-gray-700 text-white outline-none"
+      />
+      <button
+        onclick="sendMessage()"
+        class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-semibold"
+      >
+        Send
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    const chatBox = document.getElementById("chatBox");
+    const userInput = document.getElementById("userInput");
+
+    function addMessage(text, sender) {
+      const div = document.createElement("div");
+      div.className =
+        sender === "user"
+          ? "text-right"
+          : "text-left";
+
+      div.innerHTML = `
+        <span class="inline-block px-3 py-2 rounded-lg text-sm ${
+          sender === "user"
+            ? "bg-blue-600"
+            : "bg-gray-700"
+        }">
+          ${text}
+        </span>
+      `;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const message = userInput.value.trim();
+      if (!message) return;
+
+      addMessage(message, "user");
+      userInput.value = "";
+
+      try {
+        const response = await fetch("http://127.0.0.1:8000/ask", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query: message }),
+        });
+
+        const data = await response.json();
+        addMessage(data.answer || "No response", "bot");
+
+      } catch (error) {
+        addMessage("Server error ❌", "bot");
+      }
+    }
+
+    // Enter key support
+    userInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+
+</body>
+</html>
